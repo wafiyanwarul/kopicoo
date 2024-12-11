@@ -9,30 +9,41 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    //
+    // REGISTER FEATURE
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-            'role' => 'required|string|in:admin,user,staff',
+            'password' => 'required|string|min:8',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+        // Tentukan role berdasarkan password
+        $role = 'user'; // Default role
+        if ($request->password === 'KOPICOOUSR1') {
+            $role = 'admin';
+        } elseif ($request->password === 'KOPICOOUSR2') {
+            $role = 'staff';
         }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'password' => bcrypt($request->password),
+            'role' => $role, // Simpan role ke database
         ]);
 
-        return response()->json(['message' => 'User registered successfully', 'user' => $user], 201);
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'User registered successfully',
+            'token' => $token,
+            'role' => $role,
+        ], 201);
     }
 
+
+    // LOGIN FEATURE
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [

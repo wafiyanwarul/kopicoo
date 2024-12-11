@@ -19,9 +19,9 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['http://192.168.120.221:8000', 'http://kopicoo-client2.test'],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => ['Origin, Content-Type, X-Auth-Token , Cookie'],
 
     'allowed_headers' => ['*'],
 
